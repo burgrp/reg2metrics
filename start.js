@@ -12,16 +12,15 @@ let registers = {};
 
 require("@burgrp/appglue")({ require, file: __dirname + "/config.json" }).main(({
     mqttUrl,
-    httpPort,
-    metricName
+    httpPort
 }) => {
     const mtl = mqttMtl(mqttUrl);
     mqttAdvertise(mtl, (name, meta) => {
         if (!registers[name]) {
             log.info("New register", name);
             let reg = {
+                metric: name.replace(/\./g, ":").replace(/[^a-zA-Z0-9:]/g, "_"),
                 labels: {
-                    n: name,
                     ...name.split(".").map((k, i) => ({ k, i })).reduce((acc, { k, i }) => ({ [`n${i + 1}`]: k, ...acc }), {}),
                     ...Object.entries(meta).filter(([k, v]) => !(v instanceof Object)).reduce((acc, [k, v]) => ({ [k]: v, ...acc }), {})
                 }
@@ -47,9 +46,6 @@ require("@burgrp/appglue")({ require, file: __dirname + "/config.json" }).main((
 
         res.set("Content-Type", "text/plain");
 
-        res.write(`# HELP ${metricName} All registers\n`);
-        res.write(`# TYPE ${metricName} gauge\n`);
-
         for (let name in registers) {
             let reg = registers[name];
             if (reg.last) {
@@ -60,7 +56,8 @@ require("@burgrp/appglue")({ require, file: __dirname + "/config.json" }).main((
 
                 if (isFinite(value)) {
                     let labels = Object.entries(reg.labels).map(([k, v]) => `${k}="${v}"`).join(",");
-                    res.write(`${metricName}{${labels}} ${value} ${reg.last.ts}\n`);
+                    res.write(`# TYPE ${reg.metric} gauge\n`);
+                    res.write(`${reg.metric}{${labels}} ${value} ${new Date().getTime()}\n`);// ${reg.last.ts}
                 }
             }
         }
