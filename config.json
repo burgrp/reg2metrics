@@ -1,0 +1,5 @@
+{
+    "mqttUrl": "-> `mqtt://${$MQTT}`",
+    "httpPort": "-> $.HTTP_PORT || 9191",
+    "metricName": "-> $.METRIC || 'reg'"
+}
