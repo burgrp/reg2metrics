@@ -28,10 +28,7 @@ require("@burgrp/appglue")({ require, file: __dirname + "/config.json" }).main((
             registers[name] = reg;
             mqttReg(mtl, name, (actual, prev, initial) => {
                 if (!initial) {
-                    reg.last = {
-                        value: actual,
-                        ts: new Date().getTime()
-                    }
+                    reg.value=actual;
                 }
             });
         }
@@ -39,7 +36,7 @@ require("@burgrp/appglue")({ require, file: __dirname + "/config.json" }).main((
 
     const app = express()
 
-    app.get('/metrics', (req, res) => {
+    app.get('/', (req, res) => {
 
 
         log.debug("Scrape request");
@@ -48,16 +45,16 @@ require("@burgrp/appglue")({ require, file: __dirname + "/config.json" }).main((
 
         for (let name in registers) {
             let reg = registers[name];
-            if (reg.last) {
-                let value = reg.last.value;
+            let value = reg.value;
+            if (value !== undefined) {
                 if (typeof value === "boolean") {
                     value = value ? 1 : 0;
                 }
 
-                if (isFinite(value)) {
+                if (Number.isFinite(value)) {
                     let labels = Object.entries(reg.labels).map(([k, v]) => `${k}="${v}"`).join(",");
                     res.write(`# TYPE ${reg.metric} gauge\n`);
-                    res.write(`${reg.metric}{${labels}} ${value} ${new Date().getTime()}\n`);// ${reg.last.ts}
+                    res.write(`${reg.metric}{${labels}} ${value}\n`); // ${new Date().getTime()}
                 }
             }
         }
