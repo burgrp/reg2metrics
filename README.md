@@ -1,6 +1,7 @@
 # reg2metrics
-Register to Prometheus metrics provider
+MQTT-register to Prometheus metrics provider
 
+See MQTT-register specification at https://github.com/burgrp/mqtt-reg.
 
 Build the image
 ```shell
