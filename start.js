@@ -26,9 +26,14 @@ require("@burgrp/appglue")({ require, file: __dirname + "/config.json" }).main((
                 }
             };
             registers[name] = reg;
-            mqttReg(mtl, name, (actual, prev, initial) => {
-                if (!initial) {
-                    reg.value=actual;
+            mqttReg({
+                mqttMtl: mtl,
+                name: name,
+                wildcard: true,
+                callback: (actual, prev, initial) => {
+                    if (!initial) {
+                        reg.value = actual;
+                    }
                 }
             });
         }

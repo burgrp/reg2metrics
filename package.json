@@ -18,8 +18,8 @@
   "homepage": "https://github.com/burgrp/reg2metrics#readme",
   "dependencies": {
     "@burgrp/appglue": "^1.2.2",
-    "@burgrp/mqtt-reg": "^1.0.25",
+    "@burgrp/mqtt-reg": "^2.0.0",
     "debug": "^4.3.4",
-    "express": "^4.18.1"
+    "express": "^4.18.2"
   }
 }
